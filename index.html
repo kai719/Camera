@@ -9,13 +9,18 @@
 style="width:100vw; height:100vh; object-fit:cover;">
 </video>
 
+<!-- 右上のREC表示 -->
 <div id="rec" style="
 position:fixed;
 top:20px;
-left:20px;
+right:20px;
 color:red;
-font-size:20px;
+font-size:18px;
+font-weight:bold;
 display:none;
+background:rgba(0,0,0,0.5);
+padding:6px 10px;
+border-radius:10px;
 ">
 ● REC
 </div>
@@ -59,11 +64,11 @@ document.body.addEventListener("click", async () => {
   };
 
   recorder.start();
-  rec.style.display = "block";
+  rec.style.display = "block"; // ← 録画中だけ表示
 
   setTimeout(() => {
     recorder.stop();
-  }, 10000); // 10秒
+  }, 10000);
 });
 </script>
 
