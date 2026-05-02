@@ -3,24 +3,68 @@
 <head>
   <meta charset="UTF-8">
 </head>
-<body style="margin:0; background:black;">
+<body style="margin:0; background:black; overflow:hidden;">
 
 <video id="video" autoplay playsinline
 style="width:100vw; height:100vh; object-fit:cover;">
 </video>
 
+<div id="rec" style="
+position:fixed;
+top:20px;
+left:20px;
+color:red;
+font-size:20px;
+display:none;
+">
+● REC
+</div>
+
 <script>
-  document.body.addEventListener("click", async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-        audio: false
-      });
-      document.getElementById("video").srcObject = stream;
-    } catch (e) {
-      alert("エラー：" + e);
-    }
-  }, { once: true });
+let stream;
+let recorder;
+let chunks = [];
+let recording = false;
+
+async function startCamera() {
+  stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: "environment" },
+    audio: false
+  });
+  video.srcObject = stream;
+}
+
+document.body.addEventListener("click", async () => {
+  if (!stream) {
+    await startCamera();
+    return;
+  }
+
+  if (recording) return;
+
+  recording = true;
+  chunks = [];
+
+  recorder = new MediaRecorder(stream);
+  recorder.ondataavailable = e => chunks.push(e.data);
+
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: "video/webm" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "video.webm";
+    a.click();
+    recording = false;
+    rec.style.display = "none";
+  };
+
+  recorder.start();
+  rec.style.display = "block";
+
+  setTimeout(() => {
+    recorder.stop();
+  }, 10000); // 10秒
+});
 </script>
 
 </body>
